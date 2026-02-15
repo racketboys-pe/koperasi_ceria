@@ -72,6 +72,7 @@
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-warning { background: var(--warning); color: white; }
+        .btn-info { background: var(--info); color: white; }
         .btn-ghost { background: transparent; color: var(--secondary); border: 1px solid var(--border); }
 
         .form-group { margin-bottom: 1rem; }
@@ -92,8 +93,6 @@
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .modal-content { background: white; width: 95%; max-width: 600px; border-radius: 16px; padding: 2rem; max-height: 90vh; overflow-y: auto; }
 
-        .hidden { display: none !important; }
-
         #message-box {
             position: fixed; top: 20px; right: 20px; padding: 1rem 2rem; border-radius: 10px; color: white; 
             z-index: 10000; transform: translateX(200%); transition: 0.4s; font-weight: bold;
@@ -112,6 +111,7 @@
         .roi-val { font-weight: 700; color: var(--primary); }
 
         .shu-card { border-left: 5px solid var(--info); }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -121,7 +121,7 @@
     <!-- LOGIN SCREEN -->
     <div id="login-overlay">
         <div class="login-card">
-            <img id="login-logo-img" src="https://github.com/racketboys-pe/koperasi_ceria/blob/main/Logo%20Koperasi.png?raw=true" style="width: 150px;">
+            <img id="login-logo-img" src="https://github.com/racketboys-pe/koperasi_ceria/blob/main/Logo%20Koperasi.png?raw=true"width: 150px;">
             <h2 id="login-app-name" style="margin: 1rem 0;">KOPERASI CERIA ULUJAMI06</h2>
             <div class="form-group" style="text-align: left;"><label>Username</label><input type="text" id="login-user"></div>
             <div class="form-group" style="text-align: left;"><label>Password</label><input type="password" id="login-pass"></div>
@@ -240,7 +240,6 @@
                     <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:1rem;">
                         <h3>Rekap Wajib Bulanan</h3>
                         <select id="recap-year" onchange="app.features.renderSimpananRecap()" style="width:auto;">
-                            <!-- Tahun akan diisi dinamis via script -->
                         </select>
                     </div>
                     <div class="scroll-x"><table id="table-rekap-individu"><thead><tr><th>Anggota</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>Mei</th><th>Jun</th><th>Jul</th><th>Agu</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Des</th><th>Total</th></tr></thead><tbody></tbody></table></div>
@@ -382,15 +381,42 @@
                 </div>
             </section>
             
-            <!-- SETTINGS -->
+            <!-- SETTINGS & VERSION CONTROL -->
             <section id="page-settings" class="page-section">
-                <div class="card">
-                    <h3>Pengaturan & Branding</h3>
-                    <div class="form-group"><label>Nama Koperasi</label><input type="text" id="set-app-name"></div>
-                    <div class="form-group"><label>Logo URL</label><input type="text" id="set-logo-url"></div>
-                    <div class="form-group"><label>Background URL</label><input type="text" id="set-bg-url"></div>
-                    <button class="btn btn-primary" onclick="app.features.saveSettings()">Simpan</button>
-                    <hr style="margin:2rem 0;"><button class="btn btn-danger" onclick="app.features.resetData()">Reset Lokal</button>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+                    <div class="card">
+                        <h3>Pengaturan Branding</h3>
+                        <div class="form-group"><label>Nama Koperasi</label><input type="text" id="set-app-name"></div>
+                        <div class="form-group"><label>Logo URL</label><input type="text" id="set-logo-url"></div>
+                        <div class="form-group"><label>Background URL</label><input type="text" id="set-bg-url"></div>
+                        <button class="btn btn-primary" onclick="app.features.saveSettings()">Simpan</button>
+                        
+                        <hr style="margin:2rem 0;">
+                        <div style="background:#fee2e2; padding:1rem; border-radius:8px; border:1px solid #f87171;">
+                            <h4 style="color:#b91c1c; margin-bottom:0.5rem;">Zona Bahaya</h4>
+                            <p style="font-size:0.75rem; color:#7f1d1d; margin-bottom:1rem;">Tindakan ini akan menghapus data di lokal DAN di Google Spreadsheet secara permanen.</p>
+                            <button class="btn btn-danger" onclick="app.ui.openSecurityConfirm('reset_data')">Reset Database Total (Lokal & Cloud)</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3>Version Control (Backup)</h3>
+                            <button class="btn btn-info" style="font-size:0.7rem; padding:4px 10px;" onclick="app.features.createBackup()">
+                                <i data-lucide="save"></i> Simpan Versi
+                            </button>
+                        </div>
+                        <p style="font-size:0.75rem; color:var(--secondary); margin-top:0.5rem;">Daftar snapshot database yang disimpan di Cloud.</p>
+                        <div class="scroll-x">
+                            <table id="table-backups">
+                                <thead><tr><th>Waktu</th><th>Nama Versi</th><th>Aksi</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <div id="backup-loading" class="hidden" style="text-align:center; padding:1rem;">
+                            <div class="spinner" style="display:inline-block"></div> Memproses...
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
@@ -399,21 +425,18 @@
     <!-- MODALS -->
     <div id="modal-anggota" class="modal"><div class="modal-content">
         <h3>Data Anggota</h3><hr style="margin:1rem 0;">
-        <!-- Field Hidden untuk ID saat Edit -->
         <input type="hidden" id="ang-id-edit">
         <div class="form-group"><label>Nama Lengkap</label><input type="text" id="ang-nama"></div>
         <div class="form-group"><label>NIK</label><input type="text" id="ang-nik"></div>
         <div class="form-group"><label>No Anggota</label><input type="text" id="ang-no"></div>
         <div class="form-group"><label>Jenis</label>
             <select id="ang-jenis">
-                <option value="Reguler">Reguler</option>
-                <option value="Pengurus">Pengurus</option>
-                <option value="Luar Biasa">Luar Biasa</option>
+                <option value="Reguler">Reguler</option><option value="Pengurus">Pengurus</option><option value="Luar Biasa">Luar Biasa</option>
             </select>
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="form-group"><label>Nama Bank</label><input type="text" id="ang-bank-name" placeholder="Contoh: BCA"></div>
-            <div class="form-group"><label>Nomor Rekening</label><input type="text" id="ang-bank-rek" placeholder="Contoh: 12345678"></div>
+            <div class="form-group"><label>Nama Bank</label><input type="text" id="ang-bank-name"></div>
+            <div class="form-group"><label>Nomor Rekening</label><input type="text" id="ang-bank-rek"></div>
         </div>
         <div style="display:flex; justify-content:flex-end; gap:10px;"><button class="btn btn-ghost" onclick="app.ui.closeModal('modal-anggota')">Batal</button><button class="btn btn-primary" onclick="app.features.saveAnggota()">Simpan</button></div>
     </div></div>
@@ -421,30 +444,32 @@
     <div id="modal-category" class="modal"><div class="modal-content" style="max-width:350px;">
         <h3>Tambah Kategori</h3>
         <div class="form-group"><label>Nama Kategori</label><input type="text" id="new-kat-name"></div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn btn-ghost" style="flex:1" onclick="app.ui.closeModal('modal-category')">Batal / Exit</button>
-            <button class="btn btn-primary" style="flex:1" onclick="app.features.addCategory()">Tambah</button>
-        </div>
+        <div style="display:flex; gap:10px;"><button class="btn btn-ghost" style="flex:1" onclick="app.ui.closeModal('modal-category')">Batal</button><button class="btn btn-primary" style="flex:1" onclick="app.features.addCategory()">Tambah</button></div>
     </div></div>
 
     <div id="modal-user" class="modal"><div class="modal-content" style="max-width:350px;">
         <h3>User Baru</h3><div class="form-group"><label>User</label><input type="text" id="usr-name"></div><div class="form-group"><label>Pass</label><input type="password" id="usr-pass"></div><button class="btn btn-primary" onclick="app.features.addUser()">Simpan</button></div></div>
 
-    <!-- MODAL EDIT PASSWORD -->
     <div id="modal-edit-password" class="modal"><div class="modal-content" style="max-width:350px;">
         <h3>Ganti Password</h3><hr style="margin:1rem 0;">
         <input type="hidden" id="edit-pass-username">
         <div class="form-group"><label>User</label><input type="text" id="edit-pass-display" disabled></div>
         <div class="form-group"><label>Password Baru</label><input type="password" id="edit-pass-new"></div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn btn-ghost" style="flex:1" onclick="app.ui.closeModal('modal-edit-password')">Batal</button>
-            <button class="btn btn-warning" style="flex:1" onclick="app.features.saveNewPassword()">Update</button>
-        </div>
+        <div style="display:flex; gap:10px;"><button class="btn btn-ghost" style="flex:1" onclick="app.ui.closeModal('modal-edit-password')">Batal</button><button class="btn btn-warning" style="flex:1" onclick="app.features.saveNewPassword()">Update</button></div>
+    </div></div>
+
+    <div id="modal-security-confirm" class="modal"><div class="modal-content" style="max-width:350px; border: 2px solid var(--danger);">
+        <h3>Verifikasi Keamanan</h3>
+        <p style="font-size:0.7rem; color:var(--secondary); margin-bottom:1rem;" id="security-desc">Lengkapi verifikasi untuk melanjutkan tindakan sensitif ini.</p>
+        <input type="hidden" id="security-action-type">
+        <input type="hidden" id="security-action-data">
+        <div class="form-group"><label>Password Akun</label><input type="password" id="security-pass" placeholder="Password Anda"></div>
+        <div class="form-group"><label>PIN Keamanan</label><input type="password" id="security-pin" placeholder="Masukkan PIN" maxlength="6"></div>
+        <div style="display:flex; gap:10px;"><button class="btn btn-ghost" style="flex:1" onclick="app.ui.closeModal('modal-security-confirm')">Batal</button><button class="btn btn-danger" style="flex:1" onclick="app.features.verifyAndExecute()">Konfirmasi</button></div>
     </div></div>
 
     <script>
         const app = {
-            // === TEMPELKAN URL GOOGLE APPS SCRIPT WEB APP ANDA DI SINI ===
             scriptURL: "https://script.google.com/macros/s/AKfycbzxT76vGlIwGwvs3UB_WclqiaQqCa-lzKWEuC6DnpaTQlHuRguq4KqYwzHRTOQUWB6BSQ/exec", 
 
             state: {
@@ -452,6 +477,7 @@
                 categories: ["ATK", "Seragam", "Konsumsi"],
                 settings: { app_name: "SI-KOP PRO v4.0", logo_url: "https://cdn-icons-png.flaticon.com/512/2830/2830284.png", bg_url: "" }
             },
+            backups: [],
             db: { mode: 'OFFLINE' },
 
             init() {
@@ -470,6 +496,7 @@
                     document.getElementById('conn-dot').style.background = 'var(--success)';
                     document.getElementById('conn-text').innerText = "Cloud Terkoneksi (API)";
                     this.storage.pull();
+                    this.features.fetchBackups();
                 } else {
                     this.db.mode = 'OFFLINE';
                     document.getElementById('conn-dot').style.background = 'var(--warning)';
@@ -483,7 +510,6 @@
                     if (d) app.state = JSON.parse(d);
                     if (!app.state.users || !app.state.users.length) app.state.users = [{username:'admin', password:'123', role:'admin'}];
                     if (!app.state.categories) app.state.categories = ["ATK", "Seragam", "Konsumsi"];
-                    if (!app.state.roi_payments) app.state.roi_payments = [];
                 },
                 saveLocal() { localStorage.setItem('sikop_v4', JSON.stringify(app.state)); },
                 
@@ -492,10 +518,7 @@
                     document.getElementById('sync-spinner').style.display = 'block';
                     try {
                         const res = await fetch(app.scriptURL + "?action=get");
-                        const textResponse = await res.text();
-                        let result;
-                        try { result = JSON.parse(textResponse); } catch (e) { throw new Error("Format JSON server tidak valid"); }
-                        
+                        const result = await res.json();
                         if (result && result.status === "success" && result.data) {
                             const fetchedState = typeof result.data === 'string' ? JSON.parse(result.data) : result.data;
                             if (fetchedState && Object.keys(fetchedState).length > 0) {
@@ -505,12 +528,7 @@
                                 app.features.renderAll();
                             }
                         }
-                    } catch (e) {
-                        console.error("Gagal menarik data:", e);
-                        app.ui.notify(e.message, "danger");
-                    } finally {
-                        document.getElementById('sync-spinner').style.display = 'none';
-                    }
+                    } catch (e) { console.error(e); } finally { document.getElementById('sync-spinner').style.display = 'none'; }
                 },
 
                 async push() {
@@ -523,11 +541,7 @@
                         });
                         const result = await res.json();
                         if (result.status === "success") app.ui.notify("Sinkronisasi Cloud Berhasil");
-                        else throw new Error(result.error || "Gagal menyimpan");
-                    } catch (e) {
-                        console.error("Gagal sinkronisasi:", e);
-                        app.ui.notify("Gagal Sinkronisasi Cloud", "danger");
-                    }
+                    } catch (e) { app.ui.notify("Gagal Sinkronisasi Cloud", "danger"); }
                 }
             },
 
@@ -536,12 +550,8 @@
                     const u = document.getElementById('login-user').value;
                     const p = document.getElementById('login-pass').value;
                     const f = app.state.users.find(x => x.username === u && x.password === p);
-                    if (f) { 
-                        app.state.user = f; 
-                        sessionStorage.setItem('user', JSON.stringify(f)); 
-                        document.getElementById('login-overlay').style.display = 'none'; 
-                        app.ui.renderMenu(); 
-                    } else app.ui.notify("Gagal Login", "danger");
+                    if (f) { app.state.user = f; sessionStorage.setItem('user', JSON.stringify(f)); document.getElementById('login-overlay').style.display = 'none'; app.ui.renderMenu(); }
+                    else app.ui.notify("Gagal Login", "danger");
                 },
                 check() {
                     const u = sessionStorage.getItem('user');
@@ -553,13 +563,14 @@
             ui: {
                 notify(m, t="success") {
                     const b = document.getElementById('message-box');
-                    b.innerText = m; b.style.background = t === "success" ? "var(--success)" : "var(--danger)";
+                    b.innerText = m; b.style.background = t === "success" ? "var(--success)" : (t === "danger" ? "var(--danger)" : "var(--warning)");
                     b.style.transform = "translateX(0)"; setTimeout(() => b.style.transform = "translateX(200%)", 3000);
                 },
                 switchPage(id, el) {
                     document.querySelectorAll('.page-section, .nav-link').forEach(x => x.classList.remove('active'));
                     document.getElementById('page-'+id).classList.add('active'); if(el) el.classList.add('active');
                     document.getElementById('page-title').innerText = id.toUpperCase();
+                    if(id === 'settings') app.features.fetchBackups();
                     app.features.renderAll();
                 },
                 applySettings() {
@@ -572,10 +583,6 @@
                     if(s.bg_url) document.body.style.setProperty('--bg-url', `url('${s.bg_url}')`);
                 },
                 renderMenu() { document.getElementById('current-user-info').innerText = "User: " + app.state.user.username; },
-                toggleStokSize() {
-                    const k = document.getElementById('stok-kat').value;
-                    document.getElementById('stok-size-container').classList.toggle('hidden', !k.toLowerCase().includes('seragam'));
-                },
                 openModal(id) { document.getElementById(id).style.display = 'flex'; },
                 closeModal(id) { 
                     document.getElementById(id).style.display = 'none'; 
@@ -584,6 +591,20 @@
                         document.querySelectorAll('#modal-anggota input, #modal-anggota select').forEach(i => i.value = '');
                         document.getElementById('ang-jenis').value = 'Reguler';
                     }
+                    if(id === 'modal-security-confirm') {
+                        document.getElementById('security-pass').value = '';
+                        document.getElementById('security-pin').value = '';
+                    }
+                },
+                openSecurityConfirm(type, data = '') {
+                    document.getElementById('security-action-type').value = type;
+                    document.getElementById('security-action-data').value = data;
+                    document.getElementById('security-desc').innerText = type === 'reset_data' ? 'Reset akan menghapus database di Cloud & Lokal.' : 'Verifikasi untuk menghapus user ini.';
+                    this.openModal('modal-security-confirm');
+                },
+                toggleStokSize() {
+                    const k = document.getElementById('stok-kat').value;
+                    document.getElementById('stok-size-container').classList.toggle('hidden', !k.toLowerCase().includes('seragam'));
                 },
                 fmt: (v) => new Intl.NumberFormat('id-ID', { style:'currency', currency:'IDR', maximumFractionDigits:0 }).format(v)
             },
@@ -593,18 +614,14 @@
                 
                 populateYearOptions() {
                     const sel = document.getElementById('recap-year');
-                    const currentYear = new Date().getFullYear();
-                    let maxYearInData = 2030;
-                    app.state.simpanan.forEach(s => {
-                        const y = new Date(s.tgl).getFullYear();
-                        if(y > maxYearInData) maxYearInData = y;
-                    });
-                    
+                    if(!sel) return;
+                    const cur = new Date().getFullYear();
+                    let max = 2030;
+                    app.state.simpanan.forEach(s => { const y = new Date(s.tgl).getFullYear(); if(y > max) max = y; });
                     sel.innerHTML = '';
-                    for(let y = 2025; y <= Math.max(maxYearInData, currentYear); y++) {
-                        const opt = document.createElement('option');
-                        opt.value = y; opt.innerText = y;
-                        if(y === currentYear) opt.selected = true;
+                    for(let y = 2025; y <= Math.max(max, cur); y++) {
+                        const opt = document.createElement('option'); opt.value = y; opt.innerText = y;
+                        if(y === cur) opt.selected = true;
                         sel.appendChild(opt);
                     }
                 },
@@ -616,25 +633,12 @@
 
                 saveAnggota() {
                     const editId = document.getElementById('ang-id-edit').value;
-                    const data = { 
-                        id: editId ? parseInt(editId) : Date.now(), 
-                        nama: document.getElementById('ang-nama').value, 
-                        nik: document.getElementById('ang-nik').value, 
-                        no: document.getElementById('ang-no').value, 
-                        jenis: document.getElementById('ang-jenis').value, 
-                        bank: document.getElementById('ang-bank-name').value, 
-                        rek: document.getElementById('ang-bank-rek').value 
-                    };
-
+                    const data = { id: editId ? parseInt(editId) : Date.now(), nama: document.getElementById('ang-nama').value, nik: document.getElementById('ang-nik').value, no: document.getElementById('ang-no').value, jenis: document.getElementById('ang-jenis').value, bank: document.getElementById('ang-bank-name').value, rek: document.getElementById('ang-bank-rek').value };
                     if(editId) {
                         const idx = app.state.anggota.findIndex(a => a.id == editId);
                         app.state.anggota[idx] = data;
-                        this.addLog("Update Anggota: " + data.nama);
-                    } else {
-                        app.state.anggota.push(data);
-                        this.addLog("Tambah Anggota: " + data.nama);
-                    }
-                    app.ui.closeModal('modal-anggota'); app.features.renderAll();
+                    } else app.state.anggota.push(data);
+                    app.storage.push(); app.ui.closeModal('modal-anggota'); app.features.renderAll();
                 },
 
                 editAng(id) {
@@ -652,39 +656,184 @@
 
                 saveSimpanan(e) {
                     e.preventDefault();
-                    const s = { id: Date.now(), angId: document.getElementById('simp-anggota').value, jenis: document.getElementById('simp-jenis').value, nom: parseInt(document.getElementById('simp-nominal').value), tgl: document.getElementById('simp-tgl').value };
-                    app.state.simpanan.push(s); 
-                    this.addLog("Simpanan " + s.jenis + " dicatat"); 
-                    app.features.populateYearOptions();
-                    app.storage.push(); this.renderAll(); e.target.reset();
+                    app.state.simpanan.push({ id: Date.now(), angId: document.getElementById('simp-anggota').value, jenis: document.getElementById('simp-jenis').value, nom: parseInt(document.getElementById('simp-nominal').value), tgl: document.getElementById('simp-tgl').value });
+                    app.features.populateYearOptions(); app.storage.push(); this.renderAll(); e.target.reset();
                 },
 
                 saveFinance(e) {
                     e.preventDefault();
-                    const f = { id: Date.now(), akun: document.getElementById('fin-akun').value, tipe: document.getElementById('fin-tipe').value, nom: parseInt(document.getElementById('fin-nom').value), ket: document.getElementById('fin-ket').value, tgl: new Date().toLocaleDateString() };
-                    app.state.finance.push(f); this.addLog("Mutasi " + f.akun + " dicatat"); app.storage.push(); this.renderAll(); e.target.reset();
+                    app.state.finance.push({ id: Date.now(), akun: document.getElementById('fin-akun').value, tipe: document.getElementById('fin-tipe').value, nom: parseInt(document.getElementById('fin-nom').value), ket: document.getElementById('fin-ket').value, tgl: new Date().toLocaleDateString() });
+                    app.storage.push(); this.renderAll(); e.target.reset();
                 },
 
                 saveModal(e) {
                     e.preventDefault();
-                    const m = { id: Date.now(), sumber: document.getElementById('mod-sumber').value, nom: parseInt(document.getElementById('mod-nom').value), tgl: document.getElementById('mod-tgl').value };
-                    app.state.modal.push(m); this.addLog("Modal masuk dari " + m.sumber); app.storage.push(); this.renderAll(); e.target.reset();
+                    app.state.modal.push({ id: Date.now(), sumber: document.getElementById('mod-sumber').value, nom: parseInt(document.getElementById('mod-nom').value), tgl: document.getElementById('mod-tgl').value });
+                    app.storage.push(); this.renderAll(); e.target.reset();
                 },
 
                 saveROIPayment(e) {
                     e.preventDefault();
-                    const r = { id: Date.now(), sumber: document.getElementById('roi-pay-sumber').value, nom: parseInt(document.getElementById('roi-pay-nom').value), tgl: document.getElementById('roi-pay-tgl').value };
-                    app.state.roi_payments.push(r); this.addLog("Bayar ROI ke " + r.sumber); app.storage.push(); this.renderAll(); e.target.reset();
+                    app.state.roi_payments.push({ id: Date.now(), sumber: document.getElementById('roi-pay-sumber').value, nom: parseInt(document.getElementById('roi-pay-nom').value), tgl: document.getElementById('roi-pay-tgl').value });
+                    app.storage.push(); this.renderAll(); e.target.reset();
                 },
 
                 saveStok(e) {
                     e.preventDefault();
                     const k = document.getElementById('stok-kat').value;
                     const s = k.toLowerCase().includes('seragam') ? document.getElementById('stok-size').value : '-';
-                    const data = { id: Date.now(), tipe: document.getElementById('stok-tipe').value, kat: k, nama: document.getElementById('stok-nama').value, size: s, qty: parseInt(document.getElementById('stok-qty').value) };
-                    app.state.stok.push(data);
-                    this.addLog("Update Stok " + data.nama + " (" + data.tipe + ")"); 
+                    app.state.stok.push({ id: Date.now(), tipe: document.getElementById('stok-tipe').value, kat: k, nama: document.getElementById('stok-nama').value, size: s, qty: parseInt(document.getElementById('stok-qty').value) });
                     app.storage.push(); this.renderAll(); e.target.reset();
+                },
+
+                calcROI() {
+                    const mk = parseFloat(document.getElementById('roi-mod-kop').value) || 0;
+                    const mp = parseFloat(document.getElementById('roi-mod-pem').value) || 0;
+                    const l = parseFloat(document.getElementById('roi-laba').value) || 0;
+                    const p = parseFloat(document.getElementById('roi-pct').value) || 0;
+                    const ret = mp * (p/100);
+                    document.getElementById('res-total-modal').innerText = app.ui.fmt(mk + mp);
+                    document.getElementById('res-ret-pemodal').innerText = app.ui.fmt(ret);
+                    document.getElementById('res-laba-kop').innerText = app.ui.fmt(l-ret);
+                },
+
+                calcSHU() {
+                    const t = parseFloat(document.getElementById('shu-input').value) || 0;
+                    const al = [{ n: "Cadangan", p: 10 }, { n: "Jasa Usaha Anggota", p: 50 }, { n: "Dana Pengurus/Pengawas", p: 15 }, { n: "Dana Pendidikan", p: 20 }, { n: "Sosial", p: 5 }];
+                    document.getElementById('shu-body').innerHTML = al.map(i => `<tr><td>${i.n}</td><td>${i.p}%</td><td><b>${app.ui.fmt(t*(i.p/100))}</b></td></tr>`).join('');
+                },
+
+                async createBackup() {
+                    const name = prompt("Masukkan Nama Versi Backup (Contoh: Akhir Bulan Jan):");
+                    if(!name) return;
+                    document.getElementById('backup-loading').classList.remove('hidden');
+                    try {
+                        const res = await fetch(app.scriptURL, {
+                            method: "POST",
+                            body: JSON.stringify({ action: "save_backup", version_name: name, data: JSON.stringify(app.state) })
+                        });
+                        const result = await res.json();
+                        if(result.status === 'success') {
+                            app.ui.notify("Versi data berhasil disimpan ke Cloud");
+                            await this.fetchBackups();
+                        } else {
+                            app.ui.notify("Gagal: " + (result.message || "Error server"), "danger");
+                        }
+                    } catch(e) { 
+                        console.error(e);
+                        app.ui.notify("Gagal menghubungi server backup", "danger"); 
+                    }
+                    finally { document.getElementById('backup-loading').classList.add('hidden'); }
+                },
+
+                async fetchBackups() {
+                    if(app.db.mode !== 'ONLINE') return;
+                    try {
+                        const res = await fetch(app.scriptURL + "?action=get_backups");
+                        const result = await res.json();
+                        if(result.status === 'success') {
+                            app.backups = result.data;
+                            this.renderBackupTable();
+                        }
+                    } catch(e) { console.error("Gagal ambil backup"); }
+                },
+
+                renderBackupTable() {
+                    const tbody = document.querySelector('#table-backups tbody');
+                    if(!tbody) return;
+                    tbody.innerHTML = app.backups.map((b, idx) => `
+                        <tr>
+                            <td><small>${b.timestamp}</small></td>
+                            <td><b>${b.name}</b></td>
+                            <td>
+                                <button class="btn btn-warning" style="padding:4px 8px; font-size:0.6rem;" onclick="app.features.restoreBackup('${idx}')">Restore</button>
+                            </td>
+                        </tr>`).join('');
+                },
+
+                async restoreBackup(idx) {
+                    if(!confirm("HATI-HATI! Seluruh data saat ini akan ditimpa oleh data dari versi backup ini. Lanjutkan?")) return;
+                    const backupData = app.backups[idx].data_json;
+                    app.state = JSON.parse(backupData);
+                    app.storage.saveLocal();
+                    await app.storage.push();
+                    location.reload();
+                },
+
+                verifyAndExecute() {
+                    const pass = document.getElementById('security-pass').value;
+                    const pin = document.getElementById('security-pin').value;
+                    const type = document.getElementById('security-action-type').value;
+                    const data = document.getElementById('security-action-data').value;
+
+                    if (pass !== app.state.user.password) return app.ui.notify("Password Akun Salah!", "danger");
+                    if (pin !== "123456") return app.ui.notify("PIN Keamanan Salah!", "danger");
+
+                    if (type === 'delete_user') this.delUserExecute(data);
+                    else if (type === 'reset_data') this.resetDataExecute();
+                    app.ui.closeModal('modal-security-confirm');
+                },
+
+                async resetDataExecute() {
+                    app.state.anggota = []; app.state.simpanan = []; app.state.modal = [];
+                    app.state.roi_payments = []; app.state.stok = []; app.state.finance = [];
+                    app.state.logs = [{t: new Date().toLocaleString(), m: "DATABASE DIRESET TOTAL"}];
+                    app.storage.saveLocal();
+                    if(app.db.mode === 'ONLINE') {
+                        await fetch(app.scriptURL, {
+                            method: "POST",
+                            body: JSON.stringify({ action: "sync", data: JSON.stringify(app.state) })
+                        });
+                    }
+                    app.features.renderAll();
+                    app.ui.notify("DATABASE CLOUD & LOKAL DIHAPUS", "danger");
+                },
+
+                renderAll() {
+                    const sAng = document.getElementById('simp-anggota');
+                    if(sAng) sAng.innerHTML = app.state.anggota.map(a => `<option value="${a.id}">${a.nama}</option>`).join('');
+                    
+                    const sKat = document.getElementById('stok-kat');
+                    if(sKat) sKat.innerHTML = app.state.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+                    
+                    const ts = app.state.simpanan.reduce((a,b)=>a+b.nom,0);
+                    const tm = app.state.modal.reduce((a,b)=>a+b.nom,0);
+                    const bb = app.state.finance.filter(x=>x.akun==='Bank').reduce((a,b)=>a+(b.tipe==='Masuk'?b.nom:-b.nom),0);
+                    const bt = app.state.finance.filter(x=>x.akun==='Tunai').reduce((a,b)=>a+(b.tipe==='Masuk'?b.nom:-b.nom),0);
+                    
+                    const dts = document.getElementById('dash-total-saldo'); if(dts) dts.innerText = app.ui.fmt(ts+tm+bb+bt);
+                    const dsb = document.getElementById('dash-saldo-bank'); if(dsb) dsb.innerText = app.ui.fmt(bb);
+                    const dst = document.getElementById('dash-saldo-tunai'); if(dst) dst.innerText = app.ui.fmt(bt);
+                    const dta = document.getElementById('dash-total-anggota'); if(dta) dta.innerText = app.state.anggota.length;
+                    
+                    const dl = document.getElementById('dash-logs');
+                    if(dl) dl.innerHTML = app.state.logs.slice(0,5).map(l => `<tr><td><small>${l.t}</small></td><td>${l.m}</td></tr>`).join('');
+                    
+                    const tang = document.querySelector('#table-anggota tbody');
+                    if(tang) tang.innerHTML = app.state.anggota.map(a => `<tr><td>${a.id}</td><td>${a.nik}</td><td>${a.nama}</td><td>${a.jenis}</td><td><small>${a.bank} (${a.rek})</small></td><td><button class="btn btn-ghost" onclick="app.features.editAng(${a.id})"><i data-lucide="edit-3" style="width:14px;"></i></button><button class="btn btn-ghost" onclick="app.features.delAng(${a.id})"><i data-lucide="trash-2" style="width:14px;"></i></button></td></tr>`).join('');
+                    
+                    const tstok = document.querySelector('#table-stok tbody');
+                    if(tstok) tstok.innerHTML = this.getInventory().map(i => `<tr><td>${i.nama}</td><td>${i.kat}</td><td>${i.size}</td><td>${i.qty}</td></tr>`).join('');
+                    
+                    const tusr = document.querySelector('#table-users tbody');
+                    if(tusr) tusr.innerHTML = app.state.users.map(u => `<tr><td>${u.username}</td><td>${u.role}</td><td><div style="display:flex;gap:5px;"><button class="btn btn-ghost" onclick="app.features.editPass('${u.username}')"><i data-lucide="key" style="color:var(--warning);width:14px;"></i></button><button class="btn btn-ghost" onclick="app.ui.openSecurityConfirm('delete_user', '${u.username}')"><i data-lucide="trash-2" style="color:var(--danger);width:14px;"></i></button></div></td></tr>`).join('');
+                    
+                    const tmodh = document.querySelector('#table-modal-history tbody');
+                    if(tmodh) tmodh.innerHTML = app.state.modal.map(m => `<tr><td>${m.tgl}</td><td>${m.sumber}</td><td>${app.ui.fmt(m.nom)}</td></tr>`).join('');
+                    
+                    const troih = document.querySelector('#table-roi-history tbody');
+                    if(troih) troih.innerHTML = app.state.roi_payments.map(r => `<tr><td>${r.tgl}</td><td>${r.sumber}</td><td>${app.ui.fmt(r.nom)}</td></tr>`).join('');
+                    
+                    const tkeu = document.querySelector('#table-keuangan tbody');
+                    if(tkeu) tkeu.innerHTML = app.state.finance.slice(-10).map(f => `<tr><td>${f.tgl}</td><td>${f.akun}</td><td><span class="badge ${f.tipe==='Masuk'?'bg-success-lt':'bg-danger-lt'}">${f.tipe}</span></td><td>${app.ui.fmt(f.nom)}</td><td>${f.ket}</td></tr>`).join('');
+
+                    const roi_pay_sumber = document.getElementById('roi-pay-sumber');
+                    if(roi_pay_sumber) {
+                        const pmdl = [...new Set(app.state.modal.map(m => m.sumber))];
+                        roi_pay_sumber.innerHTML = pmdl.map(s => `<option value="${s}">${s}</option>`).join('');
+                    }
+
+                    this.renderSimpananRecap(); this.calcROI(); this.calcSHU(); lucide.createIcons();
                 },
 
                 getInventory() {
@@ -697,108 +846,22 @@
                     return Object.values(inv);
                 },
 
-                calcROI() {
-                    const mk = parseFloat(document.getElementById('roi-mod-kop').value) || 0;
-                    const mp = parseFloat(document.getElementById('roi-mod-pem').value) || 0;
-                    const l = parseFloat(document.getElementById('roi-laba').value) || 0;
-                    const p = parseFloat(document.getElementById('roi-pct').value) || 0;
-                    const ret = mp * (p/100);
-                    document.getElementById('res-total-modal').innerText = app.ui.fmt(mk+mp);
-                    document.getElementById('res-ret-pemodal').innerText = app.ui.fmt(ret);
-                    document.getElementById('res-laba-kop').innerText = app.ui.fmt(l-ret);
-                },
-
-                calcSHU() {
-                    const t = parseFloat(document.getElementById('shu-input').value) || 0;
-                    const al = [{ n: "Cadangan", p: 10 }, { n: "Jasa Usaha Anggota", p: 50 }, { n: "Dana Pengurus/Pengawas", p: 15 }, { n: "Dana Pendidikan", p: 20 }, { n: "Sosial", p: 5 }];
-                    document.getElementById('shu-body').innerHTML = al.map(i => `<tr><td>${i.n}</td><td>${i.p}%</td><td><b>${app.ui.fmt(t*(i.p/100))}</b></td></tr>`).join('');
-                },
-
-                renderAll() {
-                    // Dropdowns
-                    document.getElementById('simp-anggota').innerHTML = app.state.anggota.map(a => `<option value="${a.id}">${a.nama}</option>`).join('');
-                    document.getElementById('stok-kat').innerHTML = app.state.categories.map(c => `<option value="${c}">${c}</option>`).join('');
-                    const pmdl = [...new Set(app.state.modal.map(m => m.sumber))];
-                    document.getElementById('roi-pay-sumber').innerHTML = pmdl.map(s => `<option value="${s}">${s}</option>`).join('');
-
-                    // Dashboard
-                    const ts = app.state.simpanan.reduce((a,b)=>a+b.nom,0);
-                    const tm = app.state.modal.reduce((a,b)=>a+b.nom,0);
-                    const bb = app.state.finance.filter(x=>x.akun==='Bank').reduce((a,b)=>a+(b.tipe==='Masuk'?b.nom:-b.nom),0);
-                    const bt = app.state.finance.filter(x=>x.akun==='Tunai').reduce((a,b)=>a+(b.tipe==='Masuk'?b.nom:-b.nom),0);
-                    document.getElementById('dash-total-saldo').innerText = app.ui.fmt(ts+tm+bb+bt);
-                    document.getElementById('dash-saldo-bank').innerText = app.ui.fmt(bb);
-                    document.getElementById('dash-saldo-tunai').innerText = app.ui.fmt(bt);
-                    document.getElementById('dash-total-anggota').innerText = app.state.anggota.length;
-                    document.getElementById('dash-logs').innerHTML = app.state.logs.slice(0,5).map(l => `<tr><td><small>${l.t}</small></td><td>${l.m}</td></tr>`).join('');
-
-                    // Anggota
-                    document.querySelector('#table-anggota tbody').innerHTML = app.state.anggota.map(a => `<tr><td>${a.id}</td><td>${a.nik}</td><td>${a.nama}</td><td>${a.jenis}</td><td><small>${a.bank} (${a.rek})</small></td><td><button class="btn btn-ghost" onclick="app.features.editAng(${a.id})"><i data-lucide="edit-3" style="width:14px;"></i></button><button class="btn btn-ghost" onclick="app.features.delAng(${a.id})"><i data-lucide="trash-2" style="width:14px;"></i></button></td></tr>`).join('');
-
-                    // Finance
-                    document.querySelector('#table-keuangan tbody').innerHTML = app.state.finance.slice(-10).map(f => `<tr><td>${f.tgl}</td><td>${f.akun}</td><td><span class="badge ${f.tipe==='Masuk'?'bg-success-lt':'bg-danger-lt'}">${f.tipe}</span></td><td>${app.ui.fmt(f.nom)}</td><td>${f.ket}</td></tr>`).join('');
-                    
-                    // Stok
-                    document.querySelector('#table-stok tbody').innerHTML = this.getInventory().map(i => `<tr><td>${i.nama}</td><td>${i.kat}</td><td>${i.size}</td><td>${i.qty}</td></tr>`).join('');
-                    
-                    // Modal History
-                    document.querySelector('#table-modal-history tbody').innerHTML = app.state.modal.map(m => `<tr><td>${m.tgl}</td><td>${m.sumber}</td><td>${app.ui.fmt(m.nom)}</td></tr>`).join('');
-                    document.querySelector('#table-roi-history tbody').innerHTML = app.state.roi_payments.map(r => `<tr><td>${r.tgl}</td><td>${r.sumber}</td><td>${app.ui.fmt(r.nom)}</td></tr>`).join('');
-                    
-                    this.renderUsers();
-                    this.renderSimpananRecap(); this.calcROI(); this.calcSHU(); lucide.createIcons();
-                },
-
-                renderUsers() {
-                    document.querySelector('#table-users tbody').innerHTML = app.state.users.map(u => `
-                        <tr>
-                            <td>${u.username}</td>
-                            <td>${u.role}</td>
-                            <td>
-                                <div style="display:flex; gap:5px;">
-                                    <button class="btn btn-ghost" style="padding:4px;" onclick="app.features.editPass('${u.username}')">
-                                        <i data-lucide="key" style="width:14px; color:var(--warning)"></i>
-                                    </button>
-                                    <button class="btn btn-ghost" style="padding:4px;" onclick="app.features.delUser('${u.username}')">
-                                        <i data-lucide="trash-2" style="width:14px; color:var(--danger)"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>`).join('');
-                },
-
-                editPass(un) {
-                    document.getElementById('edit-pass-username').value = un;
-                    document.getElementById('edit-pass-display').value = un;
-                    document.getElementById('edit-pass-new').value = '';
-                    app.ui.openModal('modal-edit-password');
-                },
-
-                saveNewPassword() {
-                    const un = document.getElementById('edit-pass-username').value;
-                    const pass = document.getElementById('edit-pass-new').value;
-                    if(!pass) return app.ui.notify("Password tidak boleh kosong", "danger");
-
-                    const idx = app.state.users.findIndex(u => u.username === un);
-                    if(idx > -1) {
-                        app.state.users[idx].password = pass;
-                        app.ui.closeModal('modal-edit-password');
-                        app.storage.push();
-                        app.ui.notify("Password berhasil diganti");
-                    }
-                },
-
                 renderSimpananRecap() {
-                    const yr = document.getElementById('recap-year').value;
-                    document.querySelector('#table-rekap-pokok tbody').innerHTML = app.state.anggota.map(a => {
+                    const yr_sel = document.getElementById('recap-year');
+                    if(!yr_sel) return;
+                    const yr = yr_sel.value;
+                    const tpok = document.querySelector('#table-rekap-pokok tbody');
+                    if(tpok) tpok.innerHTML = app.state.anggota.map(a => {
                         const p = app.state.simpanan.find(s => s.angId == a.id && s.jenis === "Pokok");
                         return `<tr><td>${a.nama}</td><td><span class="badge ${p?'bg-success-lt':'bg-danger-lt'}">${p?'LUNAS':'BELUM'}</span></td><td>${p?app.ui.fmt(p.nom):'-'}</td></tr>`;
                     }).join('');
-                    document.querySelector('#table-rekap-sukarela tbody').innerHTML = app.state.anggota.map(a => {
+                    const tsuk = document.querySelector('#table-rekap-sukarela tbody');
+                    if(tsuk) tsuk.innerHTML = app.state.anggota.map(a => {
                         const t = app.state.simpanan.filter(s => s.angId == a.id && s.jenis === "Sukarela").reduce((x,y)=>x+y.nom, 0);
                         return `<tr><td>${a.nama}</td><td><b>${app.ui.fmt(t)}</b></td></tr>`;
                     }).join('');
-                    document.querySelector('#table-rekap-individu tbody').innerHTML = app.state.anggota.map(a => {
+                    const tind = document.querySelector('#table-rekap-individu tbody');
+                    if(tind) tind.innerHTML = app.state.anggota.map(a => {
                         let r = `<td><b>${a.nama}</b></td>`; let tc = 0;
                         for(let m=1; m<=12; m++) {
                             const p = app.state.simpanan.some(s => { const d = new Date(s.tgl); return s.angId == a.id && s.jenis === "Wajib" && (d.getMonth()+1) === m && d.getFullYear() == yr; });
@@ -815,7 +878,6 @@
                         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(app.state.simpanan), "Simpanan");
                         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(this.getInventory()), "Stok");
                         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(app.state.modal), "Modal_Masuk");
-                        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(app.state.roi_payments), "Pembayaran_ROI");
                         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(app.state.finance), "Kas_Bank");
                         XLSX.writeFile(wb, `REPORT_SIKOP_${new Date().toISOString().split('T')[0]}.xlsx`);
                         app.ui.notify("Laporan Excel Siap");
@@ -834,9 +896,21 @@
                     app.storage.push(); app.ui.closeModal('modal-user'); this.renderAll();
                 },
 
+                editPass(un) {
+                    document.getElementById('edit-pass-username').value = un; document.getElementById('edit-pass-display').value = un;
+                    document.getElementById('edit-pass-new').value = ''; app.ui.openModal('modal-edit-password');
+                },
+
+                saveNewPassword() {
+                    const un = document.getElementById('edit-pass-username').value;
+                    const pass = document.getElementById('edit-pass-new').value;
+                    if(!pass) return app.ui.notify("Password kosong", "danger");
+                    const idx = app.state.users.findIndex(u => u.username === un);
+                    if(idx > -1) { app.state.users[idx].password = pass; app.ui.closeModal('modal-edit-password'); app.storage.push(); app.ui.notify("Berhasil"); }
+                },
+
                 delAng(id) { if(confirm("Hapus?")) { app.state.anggota = app.state.anggota.filter(x=>x.id!==id); app.storage.push(); this.renderAll(); } },
-                delUser(un) { if(un === 'admin') return; if(confirm("Hapus?")) { app.state.users = app.state.users.filter(x=>x.username!==un); app.storage.push(); this.renderAll(); } },
-                resetData() { if(confirm("Reset semua?")) { localStorage.clear(); location.reload(); } },
+                delUserExecute(un) { if(un === 'admin') return; app.state.users = app.state.users.filter(x=>x.username!==un); app.storage.push(); this.renderAll(); },
                 filterTable(i, t) {
                     const q = i.value.toLowerCase();
                     document.querySelectorAll(`#${t} tbody tr`).forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none');
@@ -847,4 +921,3 @@
     </script>
 </body>
 </html>
-
