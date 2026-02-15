@@ -122,8 +122,8 @@
         <div class="login-card">
             <img id="login-logo-img" src="https://cdn-icons-png.flaticon.com/512/2830/2830284.png" style="width: 70px;">
             <h2 id="login-app-name" style="margin: 1rem 0;">SI-KOP PRO v4.0</h2>
-            <div class="form-group" style="text-align: left;"><label>Username</label><input type="text" id="login-user" placeholder="admin"></div>
-            <div class="form-group" style="text-align: left;"><label>Password</label><input type="password" id="login-pass" placeholder="123"></div>
+            <div class="form-group" style="text-align: left;"><label>Username</label><input type="text" id="login-user"></div>
+            <div class="form-group" style="text-align: left;"><label>Password</label><input type="password" id="login-pass"></div>
             <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="app.auth.login()">Masuk Sistem</button>
         </div>
     </div>
@@ -441,7 +441,6 @@
             },
 
             checkEnv() {
-                // Periksa apakah scriptURL sudah diisi dengan benar
                 if (this.scriptURL && !this.scriptURL.includes("XXXXX")) {
                     this.db.mode = 'ONLINE';
                     document.getElementById('conn-dot').style.background = 'var(--success)';
@@ -468,26 +467,24 @@
                     if (app.db.mode !== 'ONLINE') return;
                     document.getElementById('sync-spinner').style.display = 'block';
                     try {
-                        const response = await fetch(app.scriptURL, {
+                        // Perbaikan: Gunakan POST untuk menarik data agar tidak terkena fallback doGet
+                        const res = await fetch(app.scriptURL, {
                             method: "POST",
-                            mode: "no-cors", // Penting untuk cross-origin fetch ke Google Script
                             body: JSON.stringify({ action: "get" })
                         });
-                        // Karena no-cors tidak bisa membaca body response, 
-                        // untuk Google Script disarankan menggunakan redirection atau 
-                        // tetap menggunakan google.script.run jika di dalam iframe.
-                        // Namun karena ini GITHUB (External), kita gunakan metode fetch standar:
-                        
-                        const res = await fetch(app.scriptURL + "?action=get");
                         const result = await res.json();
                         
                         if (result && result.status === "success" && result.data) {
-                            app.state = JSON.parse(result.data);
-                            app.ui.applySettings();
-                            app.features.renderAll();
+                            const fetchedState = typeof result.data === 'string' ? JSON.parse(result.data) : result.data;
+                            if (Object.keys(fetchedState).length > 0) {
+                                app.state = fetchedState;
+                                app.ui.applySettings();
+                                app.features.renderAll();
+                            }
                         }
                     } catch (e) {
                         console.error("Gagal menarik data:", e);
+                        app.ui.notify("Gagal memuat data dari Cloud", "danger");
                     } finally {
                         document.getElementById('sync-spinner').style.display = 'none';
                     }
@@ -497,13 +494,19 @@
                     this.saveLocal();
                     if (app.db.mode !== 'ONLINE') return;
                     try {
-                        await fetch(app.scriptURL, {
+                        const res = await fetch(app.scriptURL, {
                             method: "POST",
                             body: JSON.stringify({ action: "sync", data: JSON.stringify(app.state) })
                         });
-                        app.ui.notify("Sinkronisasi Cloud Berhasil");
+                        const result = await res.json();
+                        if (result.status === "success") {
+                            app.ui.notify("Sinkronisasi Cloud Berhasil");
+                        } else {
+                            throw new Error(result.error || "Gagal menyimpan");
+                        }
                     } catch (e) {
-                        app.ui.notify("Gagal Sinkronisasi", "danger");
+                        console.error("Gagal sinkronisasi:", e);
+                        app.ui.notify("Gagal Sinkronisasi Cloud", "danger");
                     }
                 }
             },
