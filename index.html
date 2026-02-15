@@ -71,6 +71,7 @@
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
         .btn-ghost { background: transparent; color: var(--secondary); border: 1px solid var(--border); }
 
         .form-group { margin-bottom: 1rem; }
@@ -120,8 +121,8 @@
     <!-- LOGIN SCREEN -->
     <div id="login-overlay">
         <div class="login-card">
-            <img id="login-logo-img" src="https://github.com/racketboys-pe/koperasi_ceria/blob/main/Logo%20Koperasi.png?raw=true" style="width: 120px;">
-            <h2 id="login-app-name" style="margin: 1rem 0;">KOPERASI CERIA ULUJAMI06</h2>
+            <img id="login-logo-img" src="https://cdn-icons-png.flaticon.com/512/2830/2830284.png" style="width: 70px;">
+            <h2 id="login-app-name" style="margin: 1rem 0;">SI-KOP PRO v4.0</h2>
             <div class="form-group" style="text-align: left;"><label>Username</label><input type="text" id="login-user"></div>
             <div class="form-group" style="text-align: left;"><label>Password</label><input type="password" id="login-pass"></div>
             <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="app.auth.login()">Masuk Sistem</button>
@@ -428,6 +429,18 @@
 
     <div id="modal-user" class="modal"><div class="modal-content" style="max-width:350px;">
         <h3>User Baru</h3><div class="form-group"><label>User</label><input type="text" id="usr-name"></div><div class="form-group"><label>Pass</label><input type="password" id="usr-pass"></div><button class="btn btn-primary" onclick="app.features.addUser()">Simpan</button></div></div>
+
+    <!-- MODAL EDIT PASSWORD -->
+    <div id="modal-edit-password" class="modal"><div class="modal-content" style="max-width:350px;">
+        <h3>Ganti Password</h3><hr style="margin:1rem 0;">
+        <input type="hidden" id="edit-pass-username">
+        <div class="form-group"><label>User</label><input type="text" id="edit-pass-display" disabled></div>
+        <div class="form-group"><label>Password Baru</label><input type="password" id="edit-pass-new"></div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-ghost" style="flex:1" onclick="app.ui.closeModal('modal-edit-password')">Batal</button>
+            <button class="btn btn-warning" style="flex:1" onclick="app.features.saveNewPassword()">Update</button>
+        </div>
+    </div></div>
 
     <script>
         const app = {
@@ -737,7 +750,42 @@
                 },
 
                 renderUsers() {
-                    document.querySelector('#table-users tbody').innerHTML = app.state.users.map(u => `<tr><td>${u.username}</td><td>${u.role}</td><td><button class="btn btn-danger" onclick="app.features.delUser('${u.username}')">Hapus</button></td></tr>`).join('');
+                    document.querySelector('#table-users tbody').innerHTML = app.state.users.map(u => `
+                        <tr>
+                            <td>${u.username}</td>
+                            <td>${u.role}</td>
+                            <td>
+                                <div style="display:flex; gap:5px;">
+                                    <button class="btn btn-ghost" style="padding:4px;" onclick="app.features.editPass('${u.username}')">
+                                        <i data-lucide="key" style="width:14px; color:var(--warning)"></i>
+                                    </button>
+                                    <button class="btn btn-ghost" style="padding:4px;" onclick="app.features.delUser('${u.username}')">
+                                        <i data-lucide="trash-2" style="width:14px; color:var(--danger)"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>`).join('');
+                },
+
+                editPass(un) {
+                    document.getElementById('edit-pass-username').value = un;
+                    document.getElementById('edit-pass-display').value = un;
+                    document.getElementById('edit-pass-new').value = '';
+                    app.ui.openModal('modal-edit-password');
+                },
+
+                saveNewPassword() {
+                    const un = document.getElementById('edit-pass-username').value;
+                    const pass = document.getElementById('edit-pass-new').value;
+                    if(!pass) return app.ui.notify("Password tidak boleh kosong", "danger");
+
+                    const idx = app.state.users.findIndex(u => u.username === un);
+                    if(idx > -1) {
+                        app.state.users[idx].password = pass;
+                        app.ui.closeModal('modal-edit-password');
+                        app.storage.push();
+                        app.ui.notify("Password berhasil diganti");
+                    }
                 },
 
                 renderSimpananRecap() {
@@ -799,5 +847,3 @@
     </script>
 </body>
 </html>
-
-
