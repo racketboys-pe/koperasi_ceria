@@ -112,6 +112,23 @@
 
         .shu-card { border-left: 5px solid var(--info); }
         .hidden { display: none !important; }
+        /* Gaya untuk Footer */
+        .footer-credit {
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            border-top: 1px solid var(--border);
+            background: white;
+            margin-top: auto;
+        }
+        .sidebar-footer {
+            padding: 1rem;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -150,6 +167,10 @@
         <div style="padding: 1rem; background: rgba(0,0,0,0.2); font-size: 0.75rem;">
             <div id="current-user-info" style="margin-bottom: 0.5rem; color: #94a3b8;">User: -</div>
             <button class="btn btn-danger" style="width: 100%; padding: 0.4rem; font-size:0.7rem;" onclick="app.auth.logout()">Logout</button>
+        </div>
+        <div class="sidebar-footer">
+            <p>&copy; 2026 Gurumasakini</p>
+            <p style="font-size: 0.6rem; opacity: 0.7;">anomalicreator91@gmail.com</p>
         </div>
     </nav>
 
@@ -420,6 +441,10 @@
                 </div>
             </section>
         </div>
+        <footer class="footer-credit">
+            <p>&copy; 2026 <strong>Gurumasakini</strong>. All Rights Reserved.</p>
+            <p>Kontak: <a href="mailto:anomalicreator91@gmail.com" style="color: var(--primary); text-decoration: none;">anomalicreator91@gmail.com</a></p>
+        </footer>
     </main>
 
     <!-- MODALS -->
