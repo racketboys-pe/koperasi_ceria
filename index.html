@@ -321,11 +321,11 @@
                 </div>
             </section>
 
-            <!-- MODAL & ROI -->
+            <!-- MODAL & BAGI HASIL KEUNTUNGAN -->
             <section id="page-modal" class="page-section">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
                     <div class="card">
-                        <h3>Input Modal & ROI</h3>
+                        <h3>Input Modal & KEUNTUNGAN</h3>
                         <div style="background:#f8fafc; padding:10px; border-radius:8px; margin-bottom:1rem;">
                             <label style="font-size:0.7rem; color:var(--primary)">Opsi 1: Suntikan Modal</label>
                             <form onsubmit="app.features.saveModal(event)">
@@ -336,7 +336,7 @@
                             </form>
                         </div>
                         <div style="background:#f0fdf4; padding:10px; border-radius:8px;">
-                            <label style="font-size:0.7rem; color:var(--success)">Opsi 2: Bayar ROI ke Pemodal</label>
+                            <label style="font-size:0.7rem; color:var(--success)">Opsi 2: Bayar Keuntungan ke Pemodal</label>
                             <form onsubmit="app.features.saveROIPayment(event)">
                                 <div class="form-group"><select id="roi-pay-sumber" required></select></div>
                                 <div class="form-group"><input type="number" id="roi-pay-nom" placeholder="Nominal ROI Dibayarkan" required></div>
@@ -346,11 +346,11 @@
                         </div>
                     </div>
                     <div class="card">
-                        <h3>Kalkulator ROI Proporsional</h3>
+                        <h3>Kalkulator Keuntungan Proporsional</h3>
                         <div class="roi-output-card">
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                                 <div class="form-group"><label>Laba Bersih Koperasi (Rp)</label><input type="number" id="roi-laba" value="10000000" oninput="app.features.calcROI()"></div>
-                                <div class="form-group"><label>Alokasi Dana ROI (%)</label><input type="number" id="roi-pct" value="10" oninput="app.features.calcROI()"></div>
+                                <div class="form-group"><label>Alokasi Dana (%)</label><input type="number" id="roi-pct" value="10" oninput="app.features.calcROI()"></div>
                             </div>
                             <hr style="margin:10px 0;">
                             <div class="roi-row"><span>Total Laba Bersih:</span><span class="roi-val" id="res-laba-total">Rp 0</span></div>
@@ -373,7 +373,7 @@
                         <div class="scroll-x"><table id="table-modal-history"><thead><tr><th>Tgl</th><th>Sumber</th><th>Nominal</th></tr></thead><tbody></tbody></table></div>
                     </div>
                     <div class="card">
-                        <h3>Laporan Pembayaran ROI</h3>
+                        <h3>Laporan Pembayaran Keuntungan</h3>
                         <div class="scroll-x"><table id="table-roi-history"><thead><tr><th>Tgl</th><th>Pemodal</th><th>Nominal</th></tr></thead><tbody></tbody></table></div>
                     </div>
                 </div>
@@ -1261,3 +1261,4 @@
     </script>
 </body>
 </html>
+
