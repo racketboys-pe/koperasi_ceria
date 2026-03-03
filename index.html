@@ -213,7 +213,10 @@
                     <div class="card"><label>Total Modal Disetor</label><h2 id="mem-modal" style="color:var(--warning)">Rp 0</h2></div>
                 </div>
                 <div class="card">
-                    <h3>Riwayat Simpanan Wajib (Tahun Ini)</h3>
+                    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:1rem;">
+                        <h3>Riwayat Simpanan Wajib</h3>
+                        <select id="mem-recap-year" onchange="app.features.renderMemberDashboard()" style="width:auto;"></select>
+                    </div>
                     <div class="scroll-x">
                         <table id="table-mem-wajib" style="text-align: center;">
                             <thead>
@@ -321,11 +324,11 @@
                 </div>
             </section>
 
-            <!-- MODAL & BAGI HASIL KEUNTUNGAN -->
+            <!-- MODAL & ROI -->
             <section id="page-modal" class="page-section">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
                     <div class="card">
-                        <h3>Input Modal & KEUNTUNGAN</h3>
+                        <h3>Input Modal & ROI</h3>
                         <div style="background:#f8fafc; padding:10px; border-radius:8px; margin-bottom:1rem;">
                             <label style="font-size:0.7rem; color:var(--primary)">Opsi 1: Suntikan Modal</label>
                             <form onsubmit="app.features.saveModal(event)">
@@ -336,7 +339,7 @@
                             </form>
                         </div>
                         <div style="background:#f0fdf4; padding:10px; border-radius:8px;">
-                            <label style="font-size:0.7rem; color:var(--success)">Opsi 2: Bayar Keuntungan ke Pemodal</label>
+                            <label style="font-size:0.7rem; color:var(--success)">Opsi 2: Bayar ROI ke Pemodal</label>
                             <form onsubmit="app.features.saveROIPayment(event)">
                                 <div class="form-group"><select id="roi-pay-sumber" required></select></div>
                                 <div class="form-group"><input type="number" id="roi-pay-nom" placeholder="Nominal ROI Dibayarkan" required></div>
@@ -346,11 +349,11 @@
                         </div>
                     </div>
                     <div class="card">
-                        <h3>Kalkulator Keuntungan Proporsional</h3>
+                        <h3>Kalkulator ROI Proporsional</h3>
                         <div class="roi-output-card">
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                                 <div class="form-group"><label>Laba Bersih Koperasi (Rp)</label><input type="number" id="roi-laba" value="10000000" oninput="app.features.calcROI()"></div>
-                                <div class="form-group"><label>Alokasi Dana (%)</label><input type="number" id="roi-pct" value="10" oninput="app.features.calcROI()"></div>
+                                <div class="form-group"><label>Alokasi Dana ROI (%)</label><input type="number" id="roi-pct" value="10" oninput="app.features.calcROI()"></div>
                             </div>
                             <hr style="margin:10px 0;">
                             <div class="roi-row"><span>Total Laba Bersih:</span><span class="roi-val" id="res-laba-total">Rp 0</span></div>
@@ -373,7 +376,7 @@
                         <div class="scroll-x"><table id="table-modal-history"><thead><tr><th>Tgl</th><th>Sumber</th><th>Nominal</th></tr></thead><tbody></tbody></table></div>
                     </div>
                     <div class="card">
-                        <h3>Laporan Pembayaran Keuntungan</h3>
+                        <h3>Laporan Pembayaran ROI</h3>
                         <div class="scroll-x"><table id="table-roi-history"><thead><tr><th>Tgl</th><th>Pemodal</th><th>Nominal</th></tr></thead><tbody></tbody></table></div>
                     </div>
                 </div>
@@ -516,7 +519,7 @@
         <input type="hidden" id="ang-id-edit">
         <div class="form-group"><label>Nama Lengkap</label><input type="text" id="ang-nama"></div>
         <div class="form-group"><label>NIK (Juga sebagai Username & Pass)</label><input type="text" id="ang-nik"></div>
-        <div class="form-group"><label>No Anggota</label><input type="text" id="ang-no"></div>
+        <div class="form-group"><label>No Anggota</label><input type="text" id="ang-no" placeholder="Kosongkan untuk generate otomatis"></div>
         <div class="form-group"><label>Jenis</label>
             <select id="ang-jenis">
                 <option value="Reguler">Reguler</option><option value="Pengurus">Pengurus</option><option value="Luar Biasa">Luar Biasa</option>
@@ -779,16 +782,29 @@
                 addLog(m) { app.state.logs.unshift({t: new Date().toLocaleString(), m}); app.storage.push(); },
                 
                 populateYearOptions() {
-                    const sel = document.getElementById('recap-year');
-                    if(!sel) return;
+                    const selAdmin = document.getElementById('recap-year');
+                    const selMem = document.getElementById('mem-recap-year');
+                    
                     const cur = new Date().getFullYear();
                     let max = 2030;
                     app.state.simpanan.forEach(s => { const y = new Date(s.tgl).getFullYear(); if(y > max) max = y; });
-                    sel.innerHTML = '';
-                    for(let y = 2025; y <= Math.max(max, cur); y++) {
-                        const opt = document.createElement('option'); opt.value = y; opt.innerText = y;
-                        if(y === cur) opt.selected = true;
-                        sel.appendChild(opt);
+                    
+                    if(selAdmin) {
+                        selAdmin.innerHTML = '';
+                        for(let y = 2025; y <= Math.max(max, cur); y++) {
+                            const opt = document.createElement('option'); opt.value = y; opt.innerText = y;
+                            if(y === cur) opt.selected = true;
+                            selAdmin.appendChild(opt);
+                        }
+                    }
+
+                    if(selMem) {
+                        selMem.innerHTML = '';
+                        for(let y = 2025; y <= Math.max(max, cur); y++) {
+                            const opt = document.createElement('option'); opt.value = y; opt.innerText = y;
+                            if(y === cur) opt.selected = true;
+                            selMem.appendChild(opt);
+                        }
                     }
                 },
 
@@ -797,7 +813,9 @@
                     
                     const id = app.state.user.id;
                     const nama = app.state.user.nama;
-                    const curYear = new Date().getFullYear();
+                    
+                    const yr_sel = document.getElementById('mem-recap-year');
+                    const curYear = yr_sel ? parseInt(yr_sel.value) : new Date().getFullYear();
 
                     // 1. Tarik Data Simpanan Anggota
                     const mySimp = app.state.simpanan.filter(s => s.angId == id);
@@ -836,12 +854,52 @@
 
                 saveAnggota() {
                     const editId = document.getElementById('ang-id-edit').value;
-                    const data = { id: editId ? parseInt(editId) : Date.now(), nama: document.getElementById('ang-nama').value, nik: document.getElementById('ang-nik').value, no: document.getElementById('ang-no').value, jenis: document.getElementById('ang-jenis').value, bank: document.getElementById('ang-bank-name').value, rek: document.getElementById('ang-bank-rek').value };
+                    let inputNo = document.getElementById('ang-no').value;
+                    let finalNo = inputNo;
+
+                    // Jika ini pendaftaran baru (bukan edit) dan nomor anggota kosong
+                    if (!editId && !inputNo) {
+                        const tahun = new Date().getFullYear();
+                        const kodeUnik = "06"; // Kode Koperasi Ulujami06
+                        
+                        // Cari anggota tahun ini untuk menentukan nomor urut
+                        const anggotaTahunIni = app.state.anggota.filter(a => a.no && a.no.startsWith(`${tahun}-${kodeUnik}`));
+                        let lastNr = 0;
+                        
+                        if (anggotaTahunIni.length > 0) {
+                            // Ekstrak 3 digit terakhir dari nomor terbaru
+                            const nos = anggotaTahunIni.map(a => {
+                                const parts = a.no.split('-');
+                                return parts.length === 3 ? parseInt(parts[2]) : 0;
+                            });
+                            lastNr = Math.max(...nos.filter(n => !isNaN(n)));
+                        }
+                        
+                        const newNr = (lastNr + 1).toString().padStart(3, '0');
+                        finalNo = `${tahun}-${kodeUnik}-${newNr}`;
+                    }
+
+                    const data = { 
+                        id: editId ? parseInt(editId) : Date.now(), 
+                        nama: document.getElementById('ang-nama').value, 
+                        nik: document.getElementById('ang-nik').value, 
+                        no: finalNo, 
+                        jenis: document.getElementById('ang-jenis').value, 
+                        bank: document.getElementById('ang-bank-name').value, 
+                        rek: document.getElementById('ang-bank-rek').value 
+                    };
+
                     if(editId) {
                         const idx = app.state.anggota.findIndex(a => a.id == editId);
                         app.state.anggota[idx] = data;
-                    } else app.state.anggota.push(data);
-                    app.storage.push(); app.ui.closeModal('modal-anggota'); app.features.renderAll();
+                    } else {
+                        app.state.anggota.push(data);
+                    }
+                    
+                    app.storage.push(); 
+                    app.ui.closeModal('modal-anggota'); 
+                    app.features.renderAll();
+                    app.ui.notify("Data Anggota Berhasil Disimpan");
                 },
 
                 editAng(id) {
@@ -1261,4 +1319,3 @@
     </script>
 </body>
 </html>
-
