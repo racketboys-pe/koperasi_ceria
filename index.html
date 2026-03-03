@@ -45,7 +45,7 @@
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 90%; max-width: 400px; text-align: center;
         }
 
-        #sidebar { width: 260px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); color: white; display: flex; flex-direction: column; z-index: 100; transition: 0.3s; }
+        #sidebar { width: 260px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); color: white; display: none; flex-direction: column; z-index: 100; transition: 0.3s; }
         .nav-link {
             padding: 0.8rem 1.5rem; color: #94a3b8; text-decoration: none; display: flex; align-items: center; 
             gap: 12px; cursor: pointer; transition: 0.2s; font-size: 0.85rem;
@@ -53,7 +53,7 @@
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.05); color: white; }
         .nav-link.active { border-left: 4px solid var(--primary); background: rgba(37, 99, 235, 0.1); }
 
-        #main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #f1f5f9; }
+        #main-content { flex: 1; display: none; flex-direction: column; overflow-y: auto; background: #f1f5f9; }
         header { 
             background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; 
             align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; 
@@ -138,10 +138,16 @@
     <!-- LOGIN SCREEN -->
     <div id="login-overlay">
         <div class="login-card">
-            <img id="login-logo-img" src="https://github.com/racketboys-pe/koperasi_ceria/blob/main/Logo%20Koperasi.png?raw=true"width: 70px;">
+            <img id="login-logo-img" src="https://github.com/racketboys-pe/koperasi_ceria/blob/main/Logo%20Koperasi.png?raw=true" style="width: 70px;">
             <h2 id="login-app-name" style="margin: 1rem 0;">KOPERASI CERIA ULUJAMI06</h2>
-            <div class="form-group" style="text-align: left;"><label>Username</label><input type="text" id="login-user"></div>
-            <div class="form-group" style="text-align: left;"><label>Password</label><input type="password" id="login-pass"></div>
+            <div class="form-group" style="text-align: left;">
+                <label>Username (Admin / NIK Anggota)</label>
+                <input type="text" id="login-user">
+            </div>
+            <div class="form-group" style="text-align: left;">
+                <label>Password</label>
+                <input type="password" id="login-pass">
+            </div>
             <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="app.auth.login()">Masuk Sistem</button>
         </div>
     </div>
@@ -153,16 +159,22 @@
             <span id="nav-app-name" style="font-weight: 700; font-size: 0.9rem;">SI-KOP</span>
         </div>
         <div id="menu-container" style="flex: 1; padding-top: 1rem;">
-            <div class="nav-link active" data-page="dashboard" onclick="app.ui.switchPage('dashboard', this)"><i data-lucide="layout-dashboard"></i> Dashboard</div>
-            <div class="nav-link" data-page="anggota" onclick="app.ui.switchPage('anggota', this)"><i data-lucide="users"></i> Anggota</div>
-            <div class="nav-link" data-page="simpanan" onclick="app.ui.switchPage('simpanan', this)"><i data-lucide="wallet"></i> Simpanan</div>
-            <div class="nav-link" data-page="modal" onclick="app.ui.switchPage('modal', this)"><i data-lucide="landmark"></i> Modal & ROI</div>
-            <div class="nav-link" data-page="keuangan" onclick="app.ui.switchPage('keuangan', this)"><i data-lucide="banknote"></i> Kas & Bank</div>
-            <div class="nav-link" data-page="stok" onclick="app.ui.switchPage('stok', this)"><i data-lucide="package"></i> Stok Barang</div>
-            <div class="nav-link" data-page="shu" onclick="app.ui.switchPage('shu', this)"><i data-lucide="pie-chart"></i> Estimasi SHU</div>
-            <div class="nav-link" data-page="laporan" onclick="app.ui.switchPage('laporan', this)"><i data-lucide="file-spreadsheet"></i> Laporan Excel</div>
-            <div class="nav-link" data-page="users" onclick="app.ui.switchPage('users', this)"><i data-lucide="user-cog"></i> User</div>
-            <div class="nav-link" data-page="settings" onclick="app.ui.switchPage('settings', this)"><i data-lucide="settings"></i> Pengaturan</div>
+            <!-- Menu Khusus Anggota -->
+            <div class="nav-link" data-page="member-dashboard" style="display: none;" onclick="app.ui.switchPage('member-dashboard', this)">
+                <i data-lucide="user"></i> Dasbor Saya
+            </div>
+            
+            <!-- Menu Admin -->
+            <div class="nav-link active admin-menu" data-page="dashboard" onclick="app.ui.switchPage('dashboard', this)"><i data-lucide="layout-dashboard"></i> Dashboard</div>
+            <div class="nav-link admin-menu" data-page="anggota" onclick="app.ui.switchPage('anggota', this)"><i data-lucide="users"></i> Anggota</div>
+            <div class="nav-link admin-menu" data-page="simpanan" onclick="app.ui.switchPage('simpanan', this)"><i data-lucide="wallet"></i> Simpanan</div>
+            <div class="nav-link admin-menu" data-page="modal" onclick="app.ui.switchPage('modal', this)"><i data-lucide="landmark"></i> Modal & ROI</div>
+            <div class="nav-link admin-menu" data-page="keuangan" onclick="app.ui.switchPage('keuangan', this)"><i data-lucide="banknote"></i> Kas & Bank</div>
+            <div class="nav-link admin-menu" data-page="stok" onclick="app.ui.switchPage('stok', this)"><i data-lucide="package"></i> Stok Barang</div>
+            <div class="nav-link admin-menu" data-page="shu" onclick="app.ui.switchPage('shu', this)"><i data-lucide="pie-chart"></i> Estimasi SHU</div>
+            <div class="nav-link admin-menu" data-page="laporan" onclick="app.ui.switchPage('laporan', this)"><i data-lucide="file-spreadsheet"></i> Laporan Excel</div>
+            <div class="nav-link admin-menu" data-page="users" onclick="app.ui.switchPage('users', this)"><i data-lucide="user-cog"></i> User</div>
+            <div class="nav-link admin-menu" data-page="settings" onclick="app.ui.switchPage('settings', this)"><i data-lucide="settings"></i> Pengaturan</div>
         </div>
         <div style="padding: 1rem; background: rgba(0,0,0,0.2); font-size: 0.75rem;">
             <div id="current-user-info" style="margin-bottom: 0.5rem; color: #94a3b8;">User: -</div>
@@ -191,7 +203,29 @@
         </header>
 
         <div class="container">
-            <!-- DASHBOARD -->
+            
+            <!-- MEMBER DASHBOARD (Hanya dilihat oleh anggota) -->
+            <section id="page-member-dashboard" class="page-section">
+                <div class="grid-stats">
+                    <div class="card"><label>Total Saldo Koperasi Saya</label><h2 id="mem-total-simpanan">Rp 0</h2></div>
+                    <div class="card"><label>Simpanan Pokok</label><h2 id="mem-pokok" style="color:var(--success)">Rp 0</h2></div>
+                    <div class="card"><label>Simpanan Sukarela</label><h2 id="mem-sukarela" style="color:var(--info)">Rp 0</h2></div>
+                    <div class="card"><label>Total Modal Disetor</label><h2 id="mem-modal" style="color:var(--warning)">Rp 0</h2></div>
+                </div>
+                <div class="card">
+                    <h3>Riwayat Simpanan Wajib (Tahun Ini)</h3>
+                    <div class="scroll-x">
+                        <table id="table-mem-wajib" style="text-align: center;">
+                            <thead>
+                                <tr><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>Mei</th><th>Jun</th><th>Jul</th><th>Agu</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Des</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DASHBOARD ADMIN -->
             <section id="page-dashboard" class="page-section active">
                 <div class="grid-stats">
                     <div class="card"><label>Total Saldo Gabungan</label><h2 id="dash-total-saldo">Rp 0</h2></div>
@@ -312,20 +346,23 @@
                         </div>
                     </div>
                     <div class="card">
-                        <h3>Kalkulator ROI Transparan</h3>
+                        <h3>Kalkulator ROI Proporsional</h3>
                         <div class="roi-output-card">
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                                <div class="form-group"><label>Modal Koperasi (Rp)</label><input type="number" id="roi-mod-kop" value="100000000" oninput="app.features.calcROI()"></div>
-                                <div class="form-group"><label>Modal Pemodal (Rp)</label><input type="number" id="roi-mod-pem" value="50000000" oninput="app.features.calcROI()"></div>
-                            </div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                                <div class="form-group"><label>Laba Bersih (Rp)</label><input type="number" id="roi-laba" value="10000000" oninput="app.features.calcROI()"></div>
-                                <div class="form-group"><label>% ROI Pemodal</label><input type="number" id="roi-pct" value="10" oninput="app.features.calcROI()"></div>
+                                <div class="form-group"><label>Laba Bersih Koperasi (Rp)</label><input type="number" id="roi-laba" value="10000000" oninput="app.features.calcROI()"></div>
+                                <div class="form-group"><label>Alokasi Dana ROI (%)</label><input type="number" id="roi-pct" value="10" oninput="app.features.calcROI()"></div>
                             </div>
                             <hr style="margin:10px 0;">
-                            <div class="roi-row"><span>Total Modal Gabungan:</span><span class="roi-val" id="res-total-modal">Rp 0</span></div>
-                            <div class="roi-row"><span>Return untuk Pemodal:</span><span class="roi-val" id="res-ret-pemodal" style="color:var(--success)">Rp 0</span></div>
-                            <div class="roi-row"><span>Laba Bersih Koperasi:</span><span class="roi-val" id="res-laba-kop">Rp 0</span></div>
+                            <div class="roi-row"><span>Total Laba Bersih:</span><span class="roi-val" id="res-laba-total">Rp 0</span></div>
+                            <div class="roi-row"><span>Total Dana ROI (Dibagikan):</span><span class="roi-val" id="res-dana-roi" style="color:var(--success)">Rp 0</span></div>
+                            <div class="roi-row"><span>Sisa Laba (Masuk Koperasi):</span><span class="roi-val" id="res-laba-kop">Rp 0</span></div>
+                        </div>
+                        <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size:0.85rem;">Estimasi Pembagian per Pemodal</h4>
+                        <div class="scroll-x">
+                            <table id="table-roi-breakdown">
+                                <thead><tr><th>Pemodal</th><th>Total Modal Disetor</th><th>Porsi (%)</th><th>Estimasi ROI (Rp)</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -374,13 +411,39 @@
             <!-- SHU -->
             <section id="page-shu" class="page-section">
                 <div style="display:grid; grid-template-columns: 1fr 2fr; gap: 1.5rem;">
-                    <div class="card">
-                        <h3>Input Surplus Tahun Ini</h3>
-                        <div class="form-group"><label>Total Surplus (SHU) - Rp</label><input type="number" id="shu-input" value="50000000" oninput="app.features.calcSHU()"></div>
+                    <div style="display:flex; flex-direction:column; gap:1.5rem;">
+                        <!-- Input Surplus -->
+                        <div class="card">
+                            <h3>Input Surplus Tahun Ini</h3>
+                            <div class="form-group">
+                                <label>Total Surplus (SHU) - Rp</label>
+                                <input type="number" id="shu-input" value="50000000" oninput="app.features.calcSHU()">
+                            </div>
+                        </div>
+                        <!-- Pengaturan Persentase SHU -->
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <h3>Atur Persentase Alokasi</h3>
+                                <button class="btn btn-ghost" style="padding:4px 8px; font-size:0.7rem;" onclick="app.features.addSHUItem()">+ Item Baru</button>
+                            </div>
+                            <div id="shu-settings-list" style="margin-top:1rem; display:flex; flex-direction:column; gap:10px;">
+                                <!-- List input alokasi akan muncul di sini -->
+                            </div>
+                            <button class="btn btn-primary" style="margin-top:1rem; width:100%;" onclick="app.features.saveSHUSettings()">Simpan Persentase & Sinkron</button>
+                        </div>
                     </div>
+
+                    <!-- Tabel Tampilan Estimasi -->
                     <div class="card shu-card">
                         <h3>Estimasi Pembagian Surplus</h3>
-                        <table id="table-shu"><thead><tr><th>Alokasi</th><th>%</th><th>Nominal Estimasi</th></tr></thead><tbody id="shu-body"></tbody></table>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                            <span style="font-size:0.8rem; color:var(--secondary); font-weight:bold;">Total Alokasi: <span id="shu-total-pct">0</span>%</span>
+                            <span id="shu-warning" style="font-size:0.8rem; color:var(--danger); display:none; font-weight:bold;">Total alokasi harus genap 100%!</span>
+                        </div>
+                        <table id="table-shu">
+                            <thead><tr><th>Alokasi</th><th>%</th><th>Nominal Estimasi</th></tr></thead>
+                            <tbody id="shu-body"></tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -452,7 +515,7 @@
         <h3>Data Anggota</h3><hr style="margin:1rem 0;">
         <input type="hidden" id="ang-id-edit">
         <div class="form-group"><label>Nama Lengkap</label><input type="text" id="ang-nama"></div>
-        <div class="form-group"><label>NIK</label><input type="text" id="ang-nik"></div>
+        <div class="form-group"><label>NIK (Juga sebagai Username & Pass)</label><input type="text" id="ang-nik"></div>
         <div class="form-group"><label>No Anggota</label><input type="text" id="ang-no"></div>
         <div class="form-group"><label>Jenis</label>
             <select id="ang-jenis">
@@ -500,6 +563,11 @@
             state: {
                 user: null, anggota: [], simpanan: [], modal: [], roi_payments: [], stok: [], finance: [], logs: [], users: [],
                 categories: ["ATK", "Seragam", "Konsumsi"],
+                shu_allocations: [
+                    { id: 1, n: "Cadangan", p: 10 }, { id: 2, n: "Jasa Usaha Anggota", p: 50 }, 
+                    { id: 3, n: "Dana Pengurus/Pengawas", p: 15 }, { id: 4, n: "Dana Pendidikan", p: 20 }, 
+                    { id: 5, n: "Sosial", p: 5 }
+                ],
                 settings: { app_name: "SI-KOP PRO v4.0", logo_url: "https://cdn-icons-png.flaticon.com/512/2830/2830284.png", bg_url: "" }
             },
             backups: [],
@@ -508,10 +576,8 @@
             init() {
                 this.storage.loadLocal();
                 this.checkEnv();
-                this.auth.check();
                 this.ui.applySettings();
-                this.features.populateYearOptions();
-                this.features.renderAll();
+                this.auth.check();
                 lucide.createIcons();
             },
 
@@ -531,12 +597,34 @@
 
             storage: {
                 loadLocal() {
-                    const d = localStorage.getItem('sikop_v4');
-                    if (d) app.state = JSON.parse(d);
+                    try {
+                        let d = localStorage.getItem('sikop_v4_secure');
+                        if (d) {
+                            app.state = JSON.parse(decodeURIComponent(escape(atob(d))));
+                        } else {
+                            d = localStorage.getItem('sikop_v4');
+                            if (d) app.state = JSON.parse(d);
+                        }
+                    } catch(e) { console.warn("Load local data aman gagal, gunakan default."); }
+
                     if (!app.state.users || !app.state.users.length) app.state.users = [{username:'admin', password:'123', role:'admin'}];
                     if (!app.state.categories) app.state.categories = ["ATK", "Seragam", "Konsumsi"];
+                    if (!app.state.shu_allocations) app.state.shu_allocations = [
+                        { id: 1, n: "Cadangan", p: 10 }, { id: 2, n: "Jasa Usaha Anggota", p: 50 }, 
+                        { id: 3, n: "Dana Pengurus/Pengawas", p: 15 }, { id: 4, n: "Dana Pendidikan", p: 20 }, 
+                        { id: 5, n: "Sosial", p: 5 }
+                    ];
                 },
-                saveLocal() { localStorage.setItem('sikop_v4', JSON.stringify(app.state)); },
+                saveLocal() { 
+                    try {
+                        const dataStr = JSON.stringify(app.state);
+                        const obfuscated = btoa(unescape(encodeURIComponent(dataStr)));
+                        localStorage.setItem('sikop_v4_secure', obfuscated);
+                        localStorage.removeItem('sikop_v4'); // Bersihkan sisa data lama yg tidak aman
+                    } catch(e) {
+                        localStorage.setItem('sikop_v4', JSON.stringify(app.state));
+                    }
+                },
                 
                 async pull() {
                     if (app.db.mode !== 'ONLINE') return;
@@ -547,10 +635,16 @@
                         if (result && result.status === "success" && result.data) {
                             const fetchedState = typeof result.data === 'string' ? JSON.parse(result.data) : result.data;
                             if (fetchedState && Object.keys(fetchedState).length > 0) {
+                                const currentUser = app.state.user; // Pertahankan sesi login yg ada
                                 app.state = fetchedState;
+                                app.state.user = currentUser; 
                                 app.ui.applySettings();
-                                app.features.populateYearOptions();
-                                app.features.renderAll();
+                                
+                                // Hanya render (gambar tabel) jika user sudah valid login
+                                if (app.state.user) {
+                                    app.features.populateYearOptions();
+                                    app.features.renderAll();
+                                }
                             }
                         }
                     } catch (e) { console.error(e); } finally { document.getElementById('sync-spinner').style.display = 'none'; }
@@ -560,9 +654,11 @@
                     this.saveLocal();
                     if (app.db.mode !== 'ONLINE') return;
                     try {
+                        const payload = JSON.stringify({ action: "sync", data: JSON.stringify(app.state) });
                         const res = await fetch(app.scriptURL, {
                             method: "POST",
-                            body: JSON.stringify({ action: "sync", data: JSON.stringify(app.state) })
+                            headers: { "Content-Type": "text/plain;charset=utf-8" },
+                            body: payload
                         });
                         const result = await res.json();
                         if (result.status === "success") app.ui.notify("Sinkronisasi Cloud Berhasil");
@@ -574,18 +670,46 @@
                 login() {
                     const u = document.getElementById('login-user').value;
                     const p = document.getElementById('login-pass').value;
+
+                    // 1. Cek apakah yang login adalah Admin
                     const f = app.state.users.find(x => x.username === u && x.password === p);
-                    if (f) { app.state.user = f; sessionStorage.setItem('user', JSON.stringify(f)); document.getElementById('login-overlay').style.display = 'none'; app.ui.renderMenu(); }
-                    else app.ui.notify("Gagal Login", "danger");
+                    if (f) { 
+                        app.state.user = { ...f, role: 'admin' }; 
+                        sessionStorage.setItem('user', JSON.stringify(app.state.user)); 
+                        app.ui.showApp(); 
+                        return;
+                    }
+
+                    // 2. Cek apakah yang login adalah Anggota (Login & Pass menggunakan NIK)
+                    const ang = app.state.anggota.find(x => x.nik === u && x.nik === p);
+                    if (ang) {
+                        app.state.user = { ...ang, username: ang.nama, role: 'anggota' }; 
+                        sessionStorage.setItem('user', JSON.stringify(app.state.user)); 
+                        app.ui.showApp(); 
+                        return;
+                    }
+
+                    app.ui.notify("Username/NIK atau Password Salah", "danger");
                 },
                 check() {
                     const u = sessionStorage.getItem('user');
-                    if (u) { app.state.user = JSON.parse(u); document.getElementById('login-overlay').style.display = 'none'; app.ui.renderMenu(); }
+                    if (u) { 
+                        app.state.user = JSON.parse(u); 
+                        app.ui.showApp(); 
+                    }
                 },
                 logout() { sessionStorage.clear(); location.reload(); }
             },
 
             ui: {
+                showApp() {
+                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('sidebar').style.display = 'flex';
+                    document.getElementById('main-content').style.display = 'flex';
+                    this.renderMenu();
+                    app.features.populateYearOptions();
+                    app.features.renderAll();
+                },
                 notify(m, t="success") {
                     const b = document.getElementById('message-box');
                     b.innerText = m; b.style.background = t === "success" ? "var(--success)" : (t === "danger" ? "var(--danger)" : "var(--warning)");
@@ -594,8 +718,9 @@
                 switchPage(id, el) {
                     document.querySelectorAll('.page-section, .nav-link').forEach(x => x.classList.remove('active'));
                     document.getElementById('page-'+id).classList.add('active'); if(el) el.classList.add('active');
-                    document.getElementById('page-title').innerText = id.toUpperCase();
+                    document.getElementById('page-title').innerText = id.toUpperCase().replace('-', ' ');
                     if(id === 'settings') app.features.fetchBackups();
+                    if(id === 'member-dashboard') app.features.renderMemberDashboard();
                     app.features.renderAll();
                 },
                 applySettings() {
@@ -607,7 +732,23 @@
                     document.getElementById('set-bg-url').value = s.bg_url || '';
                     if(s.bg_url) document.body.style.setProperty('--bg-url', `url('${s.bg_url}')`);
                 },
-                renderMenu() { document.getElementById('current-user-info').innerText = "User: " + app.state.user.username; },
+                renderMenu() { 
+                    if(!app.state.user) return;
+                    document.getElementById('current-user-info').innerText = "User: " + app.state.user.username; 
+                    const role = app.state.user.role || 'admin';
+                    
+                    // Sembunyikan/Tampilkan menu berdasarkan Role
+                    document.querySelectorAll('.admin-menu').forEach(el => el.style.display = role === 'admin' ? 'flex' : 'none');
+                    const memberMenu = document.querySelector('[data-page="member-dashboard"]');
+                    if (memberMenu) memberMenu.style.display = role === 'anggota' ? 'flex' : 'none';
+
+                    // Arahkan ke halaman default masing-masing
+                    if (role === 'anggota') {
+                        app.ui.switchPage('member-dashboard', memberMenu);
+                    } else {
+                        app.ui.switchPage('dashboard', document.querySelector('[data-page="dashboard"]'));
+                    }
+                },
                 openModal(id) { document.getElementById(id).style.display = 'flex'; },
                 closeModal(id) { 
                     document.getElementById(id).style.display = 'none'; 
@@ -649,6 +790,43 @@
                         if(y === cur) opt.selected = true;
                         sel.appendChild(opt);
                     }
+                },
+
+                renderMemberDashboard() {
+                    if (!app.state.user || app.state.user.role !== 'anggota') return;
+                    
+                    const id = app.state.user.id;
+                    const nama = app.state.user.nama;
+                    const curYear = new Date().getFullYear();
+
+                    // 1. Tarik Data Simpanan Anggota
+                    const mySimp = app.state.simpanan.filter(s => s.angId == id);
+                    const pokok = mySimp.find(s => s.jenis === 'Pokok')?.nom || 0;
+                    const sukarela = mySimp.filter(s => s.jenis === 'Sukarela').reduce((a, b) => a + b.nom, 0);
+                    const wajibTotal = mySimp.filter(s => s.jenis === 'Wajib').reduce((a, b) => a + b.nom, 0);
+
+                    // 2. Tarik Data Modal Anggota
+                    const myModal = app.state.modal.filter(m => m.sumber === nama).reduce((a, b) => a + b.nom, 0);
+
+                    document.getElementById('mem-pokok').innerText = app.ui.fmt(pokok);
+                    document.getElementById('mem-sukarela').innerText = app.ui.fmt(sukarela);
+                    document.getElementById('mem-modal').innerText = app.ui.fmt(myModal);
+                    document.getElementById('mem-total-simpanan').innerText = app.ui.fmt(pokok + sukarela + wajibTotal);
+
+                    // 3. Render Status Simpanan Wajib Bulanan
+                    let rowHTML = '';
+                    for (let m = 1; m <= 12; m++) {
+                        const isPaid = mySimp.some(s => {
+                            const d = new Date(s.tgl);
+                            return s.jenis === 'Wajib' && (d.getMonth() + 1) === m && d.getFullYear() === curYear;
+                        });
+                        rowHTML += `<td class="month-cell ${isPaid ? 'month-paid' : 'month-unpaid'}">
+                            ${isPaid ? '<span style="font-size:1rem;">✓</span>' : '-'}
+                        </td>`;
+                    }
+                    
+                    const tbodyWajib = document.querySelector('#table-mem-wajib tbody');
+                    if (tbodyWajib) tbodyWajib.innerHTML = `<tr>${rowHTML}</tr>`;
                 },
 
                 addCategory() {
@@ -712,31 +890,162 @@
                 },
 
                 calcROI() {
-                    const mk = parseFloat(document.getElementById('roi-mod-kop').value) || 0;
-                    const mp = parseFloat(document.getElementById('roi-mod-pem').value) || 0;
-                    const l = parseFloat(document.getElementById('roi-laba').value) || 0;
-                    const p = parseFloat(document.getElementById('roi-pct').value) || 0;
-                    const ret = mp * (p/100);
-                    document.getElementById('res-total-modal').innerText = app.ui.fmt(mk + mp);
-                    document.getElementById('res-ret-pemodal').innerText = app.ui.fmt(ret);
-                    document.getElementById('res-laba-kop').innerText = app.ui.fmt(l-ret);
+                    const labaBersih = parseFloat(document.getElementById('roi-laba').value) || 0;
+                    const alokasiPct = parseFloat(document.getElementById('roi-pct').value) || 0;
+                    
+                    const totalDanaROI = labaBersih * (alokasiPct / 100);
+                    
+                    const elLabaTotal = document.getElementById('res-laba-total');
+                    const elDanaROI = document.getElementById('res-dana-roi');
+                    const elLabaKop = document.getElementById('res-laba-kop');
+                    
+                    if(elLabaTotal) elLabaTotal.innerText = app.ui.fmt(labaBersih);
+                    if(elDanaROI) elDanaROI.innerText = app.ui.fmt(totalDanaROI);
+                    if(elLabaKop) elLabaKop.innerText = app.ui.fmt(labaBersih - totalDanaROI);
+
+                    // Mengelompokkan modal berdasarkan nama pemodal
+                    const modalSummary = {};
+                    let totalModalPemodal = 0;
+                    app.state.modal.forEach(m => {
+                        if(!modalSummary[m.sumber]) modalSummary[m.sumber] = 0;
+                        modalSummary[m.sumber] += m.nom;
+                        totalModalPemodal += m.nom;
+                    });
+
+                    // Update tabel estimasi pembagian
+                    const tbody = document.querySelector('#table-roi-breakdown tbody');
+                    if(tbody) {
+                        if(totalModalPemodal === 0) {
+                            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--secondary);">Belum ada data modal disetor.</td></tr>';
+                        } else {
+                            const breakdownHTML = Object.keys(modalSummary).map(sumber => {
+                                const modalDisetor = modalSummary[sumber];
+                                const porsiPct = (modalDisetor / totalModalPemodal) * 100;
+                                const estimasiROI = totalDanaROI * (porsiPct / 100);
+                                return `<tr>
+                                    <td>${sumber}</td>
+                                    <td>${app.ui.fmt(modalDisetor)}</td>
+                                    <td>${porsiPct.toFixed(2)}%</td>
+                                    <td style="color:var(--success); font-weight:bold;">${app.ui.fmt(estimasiROI)}</td>
+                                </tr>`;
+                            }).join('');
+                            tbody.innerHTML = breakdownHTML;
+                        }
+                    }
+                },
+
+                renderSHUSettings() {
+                    if (!app.state.shu_allocations) {
+                        app.state.shu_allocations = [
+                            { id: 1, n: "Cadangan", p: 10 }, { id: 2, n: "Jasa Usaha Anggota", p: 50 }, 
+                            { id: 3, n: "Dana Pengurus/Pengawas", p: 15 }, { id: 4, n: "Dana Pendidikan", p: 20 }, 
+                            { id: 5, n: "Sosial", p: 5 }
+                        ];
+                    }
+                    
+                    const container = document.getElementById('shu-settings-list');
+                    if(!container) return;
+                    
+                    container.innerHTML = app.state.shu_allocations.map((a, idx) => `
+                        <div style="display:flex; gap:10px; align-items:center;" class="shu-item-row">
+                            <input type="text" value="${a.n}" placeholder="Nama Alokasi" style="flex:2" class="shu-set-name" oninput="app.features.calcSHU()">
+                            <input type="number" value="${a.p}" placeholder="%" style="flex:1" class="shu-set-pct" oninput="app.features.calcSHU()">
+                            <button class="btn btn-danger" style="padding:6px; font-size:0.7rem;" onclick="app.features.removeSHUItem(${idx})">
+                                <i data-lucide="x" style="width:14px; height:14px;"></i>
+                            </button>
+                        </div>
+                    `).join('');
+                    lucide.createIcons();
+                    this.calcSHU();
+                },
+
+                addSHUItem() {
+                    app.state.shu_allocations.push({ id: Date.now(), n: "Alokasi Baru", p: 0 });
+                    this.renderSHUSettings();
+                },
+
+                removeSHUItem(idx) {
+                    app.state.shu_allocations.splice(idx, 1);
+                    this.renderSHUSettings();
+                },
+
+                saveSHUSettings() {
+                    const rows = document.querySelectorAll('.shu-item-row');
+                    const newAlloc = [];
+                    let totalPct = 0;
+                    
+                    rows.forEach(r => {
+                        const n = r.querySelector('.shu-set-name').value;
+                        const p = parseFloat(r.querySelector('.shu-set-pct').value) || 0;
+                        newAlloc.push({ id: Date.now() + Math.random(), n, p });
+                        totalPct += p;
+                    });
+                    
+                    if (totalPct !== 100) {
+                        return app.ui.notify("Gagal Simpan: Total persentase harus genap 100%!", "warning");
+                    }
+                    
+                    app.state.shu_allocations = newAlloc;
+                    app.storage.push();
+                    app.ui.notify("Persentase SHU berhasil disimpan");
+                    this.calcSHU();
                 },
 
                 calcSHU() {
                     const t = parseFloat(document.getElementById('shu-input').value) || 0;
-                    const al = [{ n: "Cadangan", p: 10 }, { n: "Jasa Usaha Anggota", p: 50 }, { n: "Dana Pengurus/Pengawas", p: 15 }, { n: "Dana Pendidikan", p: 20 }, { n: "Sosial", p: 5 }];
-                    document.getElementById('shu-body').innerHTML = al.map(i => `<tr><td>${i.n}</td><td>${i.p}%</td><td><b>${app.ui.fmt(t*(i.p/100))}</b></td></tr>`).join('');
+                    const rows = document.querySelectorAll('.shu-item-row');
+                    let allocations = app.state.shu_allocations || [];
+                    let totalPct = 0;
+                    
+                    if(rows.length > 0) {
+                        allocations = [];
+                        rows.forEach(r => {
+                            const n = r.querySelector('.shu-set-name').value;
+                            const p = parseFloat(r.querySelector('.shu-set-pct').value) || 0;
+                            allocations.push({ n, p });
+                            totalPct += p;
+                        });
+                    } else {
+                        totalPct = allocations.reduce((sum, a) => sum + a.p, 0);
+                    }
+
+                    const warn = document.getElementById('shu-warning');
+                    const pctLabel = document.getElementById('shu-total-pct');
+                    if(pctLabel) {
+                        pctLabel.innerText = totalPct;
+                        pctLabel.style.color = totalPct !== 100 ? 'var(--danger)' : 'var(--success)';
+                    }
+                    if(warn) warn.style.display = totalPct !== 100 ? 'inline' : 'none';
+
+                    const tbody = document.getElementById('shu-body');
+                    if(tbody) {
+                        tbody.innerHTML = allocations.map(i => `
+                            <tr>
+                                <td>${i.n}</td>
+                                <td>${i.p}%</td>
+                                <td><b>${app.ui.fmt(t * (i.p / 100))}</b></td>
+                            </tr>
+                        `).join('');
+                    }
                 },
 
                 async createBackup() {
+                    if (app.db.mode !== 'ONLINE') {
+                        return app.ui.notify("Gagal: Fitur Backup hanya bisa digunakan jika terhubung ke Cloud (API).", "warning");
+                    }
+
                     const name = prompt("Masukkan Nama Versi Backup (Contoh: Akhir Bulan Jan):");
                     if(!name) return;
+                    
                     document.getElementById('backup-loading').classList.remove('hidden');
                     try {
+                        const payload = JSON.stringify({ action: "save_backup", version_name: name, data: JSON.stringify(app.state) });
                         const res = await fetch(app.scriptURL, {
                             method: "POST",
-                            body: JSON.stringify({ action: "save_backup", version_name: name, data: JSON.stringify(app.state) })
+                            headers: { "Content-Type": "text/plain;charset=utf-8" },
+                            body: payload
                         });
+                        
                         const result = await res.json();
                         if(result.status === 'success') {
                             app.ui.notify("Versi data berhasil disimpan ke Cloud");
@@ -815,6 +1124,8 @@
                 },
 
                 renderAll() {
+                    if (!app.state.user) return; // Mencegah pemuatan data ke elemen HTML sebelum login valid
+
                     const sAng = document.getElementById('simp-anggota');
                     if(sAng) sAng.innerHTML = app.state.anggota.map(a => `<option value="${a.id}">${a.nama}</option>`).join('');
                     
@@ -858,7 +1169,11 @@
                         roi_pay_sumber.innerHTML = pmdl.map(s => `<option value="${s}">${s}</option>`).join('');
                     }
 
-                    this.renderSimpananRecap(); this.calcROI(); this.calcSHU(); lucide.createIcons();
+                    this.renderSimpananRecap(); 
+                    this.calcROI(); 
+                    this.renderSHUSettings(); 
+                    if(app.state.user && app.state.user.role === 'anggota') this.renderMemberDashboard();
+                    lucide.createIcons();
                 },
 
                 getInventory() {
